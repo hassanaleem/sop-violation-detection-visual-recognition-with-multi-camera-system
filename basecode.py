@@ -17,9 +17,9 @@ def main():
         cv2.namedWindow(windowName2)
 
         # capture0 = cv2.VideoCapture(0)  # laptop's camera
-        capture1 = cv2.VideoCapture("http://10.130.138.224:4747/video")   # sample code for mobile camera video capture using IP camera
-        capture2 = cv2.VideoCapture("http://10.130.138.68:4747/video")   # sample code for mobile camera video capture using IP camera
-        capture3 = cv2.VideoCapture("http://10.130.5.86:4747/video")   # sample code for mobile camera video capture using IP camera
+        capture1 = cv2.VideoCapture("http://10.130.138.224:4747/video")
+        capture2 = cv2.VideoCapture("http://10.130.138.68:4747/video")  
+        capture3 = cv2.VideoCapture("http://10.130.5.86:4747/video") 
 
         # define size for recorded video frame for video 1
         width1 = int(capture1.get(3))
@@ -57,12 +57,12 @@ def main():
         else:
             ret1 = False
 
-        if capture2.isOpened():  # check if feed exists or not for camera 1
+        if capture2.isOpened():  # check if feed exists or not for camera 2
             ret2, frame2 = capture2.read()
         else:
             ret2 = False
 
-        if capture3.isOpened():  # check if feed exists or not for camera 1
+        if capture3.isOpened():  # check if feed exists or not for camera 3
             ret3, frame3 = capture3.read()
         else:
             ret3 = False
@@ -106,9 +106,9 @@ def main():
         cv2.namedWindow(windowName2)
 
         # capture0 = cv2.VideoCapture(0)  # laptop's camera
-        capture1 = cv2.VideoCapture("http://10.130.138.224:4747/video")   # sample code for mobile camera video capture using IP camera
-        capture2 = cv2.VideoCapture("http://10.130.138.68:4747/video")   # sample code for mobile camera video capture using IP camera
-        capture3 = cv2.VideoCapture("http://10.130.5.86:4747/video")   # sample code for mobile camera video capture using IP camera
+        capture1 = cv2.VideoCapture("http://10.130.138.224:4747/video")
+        capture2 = cv2.VideoCapture("http://10.130.138.68:4747/video")
+        capture3 = cv2.VideoCapture("http://10.130.5.86:4747/video")
         
 
         # if capture0.isOpened():  # check if feed exists or not for camera 1
@@ -121,12 +121,12 @@ def main():
         else:
             ret1 = False
 
-        if capture2.isOpened():  # check if feed exists or not for camera 1
+        if capture2.isOpened():  # check if feed exists or not for camera 2
             ret2, frame2 = capture2.read()
         else:
             ret2 = False
 
-        if capture3.isOpened():  # check if feed exists or not for camera 1
+        if capture3.isOpened():  # check if feed exists or not for camera 3
             ret3, frame3 = capture3.read()
         else:
             ret3 = False
