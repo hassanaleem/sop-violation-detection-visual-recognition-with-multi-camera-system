@@ -1,3 +1,4 @@
+from typing_extensions import ParamSpec
 import cv2
 import numpy as np
 import torch
@@ -5,6 +6,15 @@ import torch
 model = torch.hub.load('ultralytics/yolov5', 'custom', path='final.pt')
 top = cv2.imread("sstop.png")
 
+src = np.array([[605,925],[386,766],[234,653],[124,573],[415,503],[654,447],[988,373],[1325,439],[1575,485],[1880,543],[1738,633],[1572,753],[1340,917]], dtype=float)
+dst = np.array([[612,462],[716,459],[822,461],[928,462],[928, 568],[928,672],[928,883],[717,883],[612,883],[507,883],[507,779],[507,671],[507,567]], dtype=float)
+
+src1 = np.array([[195,341],[120,287],[68,251],[28,221],[125,203],[200,188],[310,171],[415,193],[491,214],[583,235],[543,261],[496,296],[427,343]], dtype=float)
+dst1 = np.array([[507,989],[507,884],[507,778],[507,673],[612, 673],[716,673],[927,673],[927,883],[927,988],[927,1093],[822,1093],[717,1093],[613,1093]], dtype=float)
+
+src2 = np.array([[580,935],[384,786],[239,683],[144,605],[416,548],[639,509],[946,445],[1237,523],[1453,571],[1708,645],[1598,707],[1455,805],[1238,945]], dtype=float)
+dst2 = np.array([[1140,655],[1140,672],[1140,777],[1140,886],[1033, 883],[928,885],[717,881],[716,672],[716,568],[716,455],[823,416],[929,462],[1035,461]], dtype=float)
+        
 
 def find_dis(p_list, result, pointsSopViolation):
     list_len = len(p_list)
@@ -65,7 +75,7 @@ def heatmap(points, type, heatmapW, gtop, pointCount, windowName):
         heatmapW.write(heatmap)
         return points
 
-def main_func(cap, cap1, cap2):
+def main_func(cap, cap1, cap2, source, destination, source1, destination1, source2, destination2):
     points_list = []
     pointCount = []
     pointsAnimated = []
@@ -108,32 +118,13 @@ def main_func(cap, cap1, cap2):
         results2.render()
         cv2.imshow("2", frame2)
 
-        ################################################################################# frame hh cam 1
-        #ground points
-        source = np.array([[605,925],[386,766],[234,653],[124,573],[415,503],[654,447],[988,373],[1325,439],[1575,485],[1880,543],[1738,633],[1572,753],[1340,917]], dtype=float)
-        destination = np.array([[612,462],[716,459],[822,461],[928,462],[928, 568],[928,672],[928,883],[717,883],[612,883],[507,883],[507,779],[507,671],[507,567]], dtype=float)
         
         M, mask = cv2.findHomography(source, destination)
         top_img = cv2.warpPerspective(f, M, (top_cols, top_rows))
-
-        ################################################################################# frame 1 aa cam 2
-        source1 = np.array([[195,341],[120,287],[68,251],[28,221],[125,203],[200,188],[310,171],[415,193],[491,214],[583,235],[543,261],[496,296],[427,343]], dtype=float)
-        destination1 = np.array([[507,989],[507,884],[507,778],[507,673],[612, 673],[716,673],[927,673],[927,883],[927,988],[927,1093],[822,1093],[717,1093],[613,1093]], dtype=float)
         
         M1, mask1 = cv2.findHomography(source1, destination1)
         top_img1 = cv2.warpPerspective(f1, M1, (top_cols, top_rows))
 
-        ################################################################################# frame 2 jj cam 3 done
-        # Head points 
-        sourceH = np.array([[370,254],[690,460],[937,433],[1480,580],[1320,668]], dtype=float)
-        destinationH = np.array([[1140,675],[1033,673],[932,667],[928,463],[1035, 460]], dtype=float)
-        H2, _ = cv2.findHomography(sourceH, destinationH)
-
-
-        # ground points
-        source2 = np.array([[580,935],[384,786],[239,683],[144,605],[416,548],[639,509],[946,445],[1237,523],[1453,571],[1708,645],[1598,707],[1455,805],[1238,945]], dtype=float)
-        destination2 = np.array([[1140,655],[1140,672],[1140,777],[1140,886],[1033, 883],[928,885],[717,881],[716,672],[716,568],[716,455],[823,416],[929,462],[1035,461]], dtype=float)
-        
         M2, mask2 = cv2.findHomography(source2, destination2)
         top_img2 = cv2.warpPerspective(f2, M2, (top_cols, top_rows))
 
@@ -283,6 +274,29 @@ def main_func(cap, cap1, cap2):
     cap.release()
     cv2.destroyAllWindows() 
 
+def click_event(event, x, y, flags, params):
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+  
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(params[0], str(x) + ',' +
+                    str(y), (x,y), font,
+                    1, (255, 0, 0), 2)
+        cv2.imshow('image', params[0])
+        pointSrc = params[2]
+        pointSrc.append([x, y])
+
+    if event == cv2.EVENT_RBUTTONDOWN:
+ 
+ 
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(params[1], str(x) + ',' +
+                    str(y), (x,y), font,
+                    1, (255, 0, 0), 2)
+        cv2.imshow('Top', params[1])
+        pointDst = params[3]
+        pointDst.append([x, y])
+    
 
 ans = int(input("Enter 1 prerecorded 2 live : "))
 
@@ -291,8 +305,7 @@ if ans == 1:
     cap = cv2.VideoCapture('cam1.avi')
     cap1 = cv2.VideoCapture('cam2.avi')
     cap2 = cv2.VideoCapture('cam3.avi')
-
-    main_func(cap, cap1, cap2)
+    main_func(cap, cap1, cap2, src, dst, src1, dst1, src2, dst2)
     
 
 elif ans == 2:
@@ -300,6 +313,55 @@ elif ans == 2:
     cap = cv2.VideoCapture("http://10.130.138.224:4747/video")
     cap1 = cv2.VideoCapture("http://10.130.138.68:4747/video")
     cap2 = cv2.VideoCapture(0)
+    
+    answer = int(input("Press 1 for dynamic allocation of points, press 2 for preexisting points"))
 
-    main_func(cap, cap1. cap2)
+    if answer == 1:
+        _, pts = cap.read()
+        _, pts1 = cap1.read()
+        _, pts2 = cap2.read()
+
+        s = list()
+        d = list()
+        s1 = list()
+        d1 = list()
+        s2 = list()
+        d2 = list()
+
+        topc = top.copy()
+        cv2.imshow("image", pts)
+        cv2.setMouseCallback('image', click_event, [pts, topc, s, d])
+        cv2.imshow("Top", topc)
+        cv2.setMouseCallback('Top', click_event, [pts, topc, s, d])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+        topc1 = top.copy()
+        cv2.imshow("image", pts1)
+        cv2.setMouseCallback('image', click_event, [pts1, topc1, s1, d1])
+        cv2.imshow("Top", topc1)
+        cv2.setMouseCallback('Top', click_event, [pts1, topc1, s1, d1])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows() 
+
+        topc2 = top.copy()
+        cv2.imshow("image", pts2)
+        cv2.setMouseCallback('image', click_event, [pts2, topc2, s2, d2])
+        cv2.imshow("Top", topc2)
+        cv2.setMouseCallback('Top', click_event, [pts2, topc2, s2, d2])
+        cv2.waitKey(0)
+        cv2.destroyAllWindows() 
+
+        s = np.array(s)
+        d = np.array(d)
+        s1 = np.array(s1)
+        d1 = np.array(d1)
+        s2 = np.array(s2)
+        d2 = np.array(d2)
+        main_func(cap, cap1, cap2, s, d, s1, d1, s2, d2)
+
+    if answer == 2:
+        main_func(cap, cap1, cap2, src, dst, src1, dst1, src2, dst2)
+
+
 
